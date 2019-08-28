@@ -9,17 +9,27 @@
 <div class="app exp">
 	<h1>Move Mixer</h1>
 	<form>
-		<div>
-			<label for="bpm">BPM</label>
-			<input class="text" type="number" id="bpm" value="160" style="width: 50px;">
-		</div>
-		<div id="moveList" class="checkbox">
-		</div>
-		<button type="button" id="prime">Load</button>
+    <div id="selection">
+      <div>
+        <label for="bpm">BPM</label>
+        <input class="text" type="number" id="bpm" value="160" style="width: 50px;">
+      </div>
+      <div>
+        <label for="minutes">Minutes</label>
+        <input class="text" type="number" id="minutes" value="3" style="width: 50px;">
+        <label for="seconds">Seconds</label>
+        <input class="text" type="number" id="seconds" value="0" style="width: 50px;">
+      </div>
+      <div id="moveList" class="checkbox">
+      </div>
+      <button type="button" id="clear">Clear all moves</button>
+		  <button type="button" id="prime">Generate sequence</button>
+    </div>
+    <div id="sequence"></div>
 		<div id="controls" style="display:none">
 			<button type="button" id="play">Play</button>
 			<button type="button" id="stop" disabled>Stop</button>
-      <button type="button" id="clear">Clear all moves</button>
+			<button type="button" id="reset">Reset</button>
 		</div>
 	</form>
 	<script src="player.js"></script>

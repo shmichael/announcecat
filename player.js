@@ -64,18 +64,50 @@ let primeButton = document.getElementById('prime');
 let clearButton = document.getElementById('clear');
 let playButton = document.getElementById('play');
 let stopButton = document.getElementById('stop');
+let resetButton = document.getElementById('reset');
+let controlsArea = document.getElementById('controls');
+let selectionArea = document.getElementById('selection');
+let sequenceArea = document.getElementById('sequence');
 
 // Timer for the periodic speech output. Set on play.
 let timer;
+
+// Sequence of moves. Generated when button clicked.
+let sequence;
 
 let player = new TermPlayer();
 
 primeButton.addEventListener('click', () => {
   // Prime the speech synthesis.
   player.play(' ');
-  document.getElementById('controls').style.display = null;
-  primeButton.style.display = 'none';
-  return false;
+
+  // Swap the controls.
+  selectionArea.style.display = 'none';
+  sequenceArea.style.display = null;
+  controlsArea.style.display = null;
+
+  // Generate the sequence. Clear any previous sequence.
+  sequence = [];
+  sequenceArea.innerHtml = '';
+  while (sequenceArea.firstChild) {
+    sequenceArea.removeChild(sequenceArea.firstChild);
+  }
+
+  let bpm = parseInt(bpmInput.value, 10);
+  let minutes = parseInt(document.getElementById('minutes').value, 10);
+  let seconds = parseInt(document.getElementById('seconds').value, 10);
+  let totalSongMinutes = minutes + seconds/60;
+  let totalBeats = totalSongMinutes * bpm;
+  // Sequence is one move per 8 beats. The first move will be "starting", so remove 1.
+  let lengthOfSequence = parseInt(totalBeats / 8 - 1, 10);
+  for (let i = 0; i < lengthOfSequence; i++) {
+    let randomIndex = Math.floor(Math.random() * selectedTerms.length);
+    sequence.push(selectedTerms[randomIndex]);
+    let termDiv = document.createElement('div');
+    termDiv.innerText = selectedTerms[randomIndex];
+    termDiv.id = "term_" + i;
+    sequenceArea.append(termDiv);
+  }
 });
 
 clear.addEventListener('click', () => {
@@ -92,21 +124,45 @@ clear.addEventListener('click', () => {
         });
 });
 
-stopButton.addEventListener('click', () => {
+function stop() {
     clearInterval(timer);
     stopButton.disabled = true;
     playButton.disabled = false;
+}
+
+stopButton.addEventListener('click', () => {
+    stop();
 });
 
 playButton.addEventListener('click', () => {
     let activeSounds = [];
     let bpm = parseInt(bpmInput.value, 10);
     let delayValue = 60*8*1000/bpm;
+    let currentTerm = 0;
     player.play('Starting');
     timer = setInterval(() => {
-        let index = Math.floor(Math.random() * selectedTerms.length);
-        player.play(selectedTerms[index]);
-        }, delayValue);
+        if (currentTerm > 0) {
+          document.getElementById('term_' + (currentTerm - 1)).classList.remove('current');
+        }
+        document.getElementById('term_' + currentTerm).classList.add('current');
+        // Scroll down, but keep at least 2 terms above.
+        if (currentTerm > 1) {
+          location.href='#term_' + (currentTerm - 2);
+        }
+        player.play(sequence[currentTerm]);
+        currentTerm++;
+        if (currentTerm == sequence.length) {
+          stop();
+        }
+    }, delayValue);
     playButton.disabled = true;
     stopButton.disabled = false;
+});
+
+resetButton.addEventListener('click', () => {
+  stop();
+  // Swap the controls.
+  selectionArea.style.display = null;
+  sequenceArea.style.display = 'none';
+  controlsArea.style.display = 'none';
 });

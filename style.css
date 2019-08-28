@@ -136,3 +136,22 @@ input[type="checkbox"].round-checkbox:checked + label:hover span:before {
   background: #1790b5;
   transition: width 150ms ease 100ms;
 }
+
+#controls {
+  position: fixed;
+  bottom: 10px;
+  right: auto;
+  left: auto;
+  width: 300px;
+}
+
+#controls button {
+  background-color: white;
+  size: 50px;
+  font-size: 36px;
+}
+
+.current {
+  font-weight: bold;
+  font-size: 24px;
+}
