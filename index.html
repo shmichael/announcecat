@@ -164,13 +164,14 @@
 		</div>
 	</form>
 	<script>
-		var context = new (window.AudioContext || window.webkitAudioContext)();
+    var context = new (window.AudioContext || window.webkitAudioContext)();
 
 		const mediaFolder = './media/';
 		const soundList = {
 		  'Apple Jacks': 'applejacks.ogg',
 			'Suzy Qs': 'suzyqs.ogg',
 			'Shorty George': 'shorty.ogg',
+      'Half break': '',
 		}
 		selectedSounds = [];
 
@@ -186,7 +187,10 @@
 					source.buffer = this.soundMap[soundKey];
 					source.connect(this.context.destination);
 					source.start(0);
-				}
+				} else {
+          var msg = new SpeechSynthesisUtterance(soundKey);
+          window.speechSynthesis.speak(msg);
+        }
 			}
 		}
 
@@ -209,6 +213,7 @@
 					}
 				}.bind(this);
 				let addError = function(key) {
+debugger;
 					this._downloadErrors[key] = 1;
 					itemsLeft--;
 					if (itemsLeft == 0) {
@@ -216,6 +221,11 @@
 					}
 				}.bind(this);
 				for (let key in soundList) {
+          if (!soundList[key]) {
+            this._downloadedSoundResponse[key] = null;
+            itemsLeft--;
+            continue;
+          }
 					let request = new XMLHttpRequest();
 					request.open('GET', this.mediaFolder + soundList[key], true);
 					request.responseType = 'arraybuffer';
@@ -286,6 +296,7 @@
 			let player = new SoundPlayer(context, downloaded);
 			let playButton = document.getElementById("play");
 			playButton.addEventListener("click", () => {
+        context = new (window.AudioContext || window.webkitAudioContext)();
 			  let activeSounds = [];
 				let bpm = parseInt(bpmInput.value, 10);
 				let delayValue = 60*8*1000/bpm;
