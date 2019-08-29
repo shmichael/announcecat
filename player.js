@@ -49,6 +49,7 @@ let timer;
 // Sequence of moves. Generated when button clicked.
 let sequence;
 let terms;
+let noSleep = new NoSleep();
 
 let player = new TermPlayer();
 
@@ -152,6 +153,7 @@ function stop() {
     clearInterval(timer);
     stopButton.disabled = true;
     playButton.disabled = false;
+    noSleep.disable();
 
     // TODO: remove "current" class.
 }
@@ -163,6 +165,7 @@ stopButton.addEventListener('click', () => {
 playButton.addEventListener('click', () => {
     playButton.disabled = true;
     stopButton.disabled = false;
+    noSleep.enable();
 
     let currentTerm = 0;
     let playNext = () => {
