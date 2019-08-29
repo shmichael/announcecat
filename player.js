@@ -155,7 +155,11 @@ function stop() {
     playButton.disabled = false;
     noSleep.disable();
 
-    // TODO: remove "current" class.
+    // Clean up any highlighted term.
+    let currents = document.getElementsByClassName('current');
+    for (el in currents) {
+      currents[el].classList = '';
+    }
 }
 
 stopButton.addEventListener('click', () => {
