@@ -11,9 +11,6 @@ const defaultTerms = [
   'Suzy Q',
 ]
 
-// Copy the default terms. Maybe we don't need defaults at all.
-selectedTerms = defaultTerms.slice()
-
 class TermPlayer {
   constructor() {
     this.context = new (window.AudioContext || window.webkitAudioContext)();
@@ -27,41 +24,18 @@ class TermPlayer {
 }
 
 // Display checkboxes for moves.
-let moveList = document.getElementById('moveList');
+let moveListTextArea = document.getElementById('moveList');
+let initialText = '';
 for (let term in defaultTerms) {
-  // Create checkboxes.
-  let checkboxContainer = document.createElement('div');
-  let checkbox = document.createElement('input');
-  checkbox.name = defaultTerms[term];
-  checkbox.type = 'checkbox';
-  checkbox.checked = 1;
-  checkbox.classList.add('round-checkbox');
-  checkbox.id = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-  checkbox.onchange = () => {
-    if (checkbox.checked) {
-      selectedTerms.push(checkbox.name);
-    } else {
-      let index = selectedSounds.indexOf(checkbox.name);
-      if (index > -1) {
-        selectedTerms.splice(index, 1);
-      }
-    }
-  };
-
-  // Add checkbox labels.
-  let label = document.createElement('label');
-  label.htmlFor = checkbox.id;
-  label.appendChild(document.createElement('span'));
-  label.appendChild(document.createTextNode(defaultTerms[term]));
-  checkboxContainer.appendChild(checkbox);
-  checkboxContainer.appendChild(label);
-  moveList.appendChild(checkboxContainer);
-
+  initialText += defaultTerms[term] + "\n";
 }
+moveListTextArea.value = initialText;
 
 let bpmInput = document.getElementById('bpm');
-let primeButton = document.getElementById('prime');
-let clearButton = document.getElementById('clear');
+let randomizeButton = document.getElementById('randomize');
+let aaabButton = document.getElementById('aaab');
+let ababButton = document.getElementById('abab');
+let asisButton = document.getElementById('asis');
 let playButton = document.getElementById('play');
 let stopButton = document.getElementById('stop');
 let resetButton = document.getElementById('reset');
@@ -74,10 +48,11 @@ let timer;
 
 // Sequence of moves. Generated when button clicked.
 let sequence;
+let terms;
 
 let player = new TermPlayer();
 
-primeButton.addEventListener('click', () => {
+function switchToPlayMode() {
   // Prime the speech synthesis.
   player.play(' ');
 
@@ -86,48 +61,99 @@ primeButton.addEventListener('click', () => {
   sequenceArea.style.display = null;
   controlsArea.style.display = null;
 
+  // Collect the terms. Removes blank lines.
+  terms = moveListTextArea.value.replace(/^\s*[\r\n]|\n^$/gm, "").split('\n');
+
   // Generate the sequence. Clear any previous sequence.
   sequence = [];
-  sequenceArea.innerHtml = '';
   while (sequenceArea.firstChild) {
     sequenceArea.removeChild(sequenceArea.firstChild);
   }
+}
 
+function switchToSetupMode() {
+  stop();
+  // Swap the controls.
+  selectionArea.style.display = null;
+  sequenceArea.style.display = 'none';
+  controlsArea.style.display = 'none';
+}
+
+function getSequenceLength() {
   let bpm = parseInt(bpmInput.value, 10);
   let minutes = parseInt(document.getElementById('minutes').value, 10);
   let seconds = parseInt(document.getElementById('seconds').value, 10);
   let totalSongMinutes = minutes + seconds/60;
   let totalBeats = totalSongMinutes * bpm;
-  // Sequence is one move per 8 beats. The first move will be "starting", so remove 1.
-  let lengthOfSequence = parseInt(totalBeats / 8 - 1, 10);
-  for (let i = 0; i < lengthOfSequence; i++) {
-    let randomIndex = Math.floor(Math.random() * selectedTerms.length);
-    sequence.push(selectedTerms[randomIndex]);
-    let termDiv = document.createElement('div');
-    termDiv.innerText = selectedTerms[randomIndex];
-    termDiv.id = "term_" + i;
-    sequenceArea.append(termDiv);
+  // Sequence is one move per 8 beats.
+  return(parseInt(totalBeats / 8, 10));
+}
+
+function addTerm(term, index) {
+  sequence.push(term);
+  let termDiv = document.createElement('div');
+  termDiv.innerText = term;
+  termDiv.id = "term_" + index;
+  sequenceArea.append(termDiv);
+}
+
+randomizeButton.addEventListener('click', () => {
+  switchToPlayMode();
+
+  for (let i = 0; i < getSequenceLength(); i++) {
+    let randomIndex = Math.floor(Math.random() * terms.length);
+    addTerm(terms[randomIndex], i);
   }
 });
 
-clear.addEventListener('click', () => {
-    let moveListCollection = Array.prototype.slice.call( moveList.children );
-    moveListCollection.filter(
-        el => {
-          return el &&
-          el.children &&
-          el.children[0] &&
-          el.children[0].type &&
-          el.children[0].type == 'checkbox';
-        }).map(el => {
-          el.children[0].checked = false;
-        });
+aaabButton.addEventListener('click', () => {
+  switchToPlayMode();
+  console.log(terms);
+
+  for (let i = 0; i < getSequenceLength()/4; i++) {
+    let randomIndex = Math.floor(Math.random() * terms.length);
+    let randomIndexB = Math.floor(Math.random() * (terms.length - 1));
+    if (randomIndex == randomIndexB) {
+      randomIndexB = terms.length - 1;
+    }
+    console.log("adding aaab " + randomIndex + ":" + terms[randomIndex] + ", " + randomIndexB + ":" + terms[randomIndexB]);
+    addTerm(terms[randomIndex], i*4);
+    addTerm(terms[randomIndex], i*4 + 1);
+    addTerm(terms[randomIndex], i*4 + 2);
+    addTerm(terms[randomIndexB], i*4 + 3);
+  }
+});
+
+ababButton.addEventListener('click', () => {
+  switchToPlayMode();
+
+  for (let i = 0; i < getSequenceLength()/4; i++) {
+    let randomIndex = Math.floor(Math.random() * terms.length);
+    let randomIndexB = Math.floor(Math.random() * (terms.length - 1));
+    if (randomIndex == randomIndexB) {
+      randomIndexB = terms.length - 1;
+    }
+    addTerm(terms[randomIndex], i*4);
+    addTerm(terms[randomIndexB], i*4 + 1);
+    addTerm(terms[randomIndex], i*4 + 2);
+    addTerm(terms[randomIndexB], i*4 + 3);
+  }
+});
+
+asisButton.addEventListener('click', () => {
+  switchToPlayMode();
+
+  for (let i in terms) {
+    addTerm(terms[i], i);
+  }
 });
 
 function stop() {
     clearInterval(timer);
     stopButton.disabled = true;
     playButton.disabled = false;
+
+    // TODO: remove "current" class.
 }
 
 stopButton.addEventListener('click', () => {
@@ -135,12 +161,11 @@ stopButton.addEventListener('click', () => {
 });
 
 playButton.addEventListener('click', () => {
-    let activeSounds = [];
-    let bpm = parseInt(bpmInput.value, 10);
-    let delayValue = 60*8*1000/bpm;
+    playButton.disabled = true;
+    stopButton.disabled = false;
+
     let currentTerm = 0;
-    player.play('Starting');
-    timer = setInterval(() => {
+    let playNext = () => {
         if (currentTerm > 0) {
           document.getElementById('term_' + (currentTerm - 1)).classList.remove('current');
         }
@@ -154,15 +179,14 @@ playButton.addEventListener('click', () => {
         if (currentTerm == sequence.length) {
           stop();
         }
-    }, delayValue);
-    playButton.disabled = true;
-    stopButton.disabled = false;
+    }
+
+    let bpm = parseInt(bpmInput.value, 10);
+    let delayValue = 60*8*1000/bpm;
+    timer = setInterval(playNext, delayValue);
+    playNext();
 });
 
 resetButton.addEventListener('click', () => {
-  stop();
-  // Swap the controls.
-  selectionArea.style.display = null;
-  sequenceArea.style.display = 'none';
-  controlsArea.style.display = 'none';
+  switchToSetupMode();
 });

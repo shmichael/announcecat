@@ -151,6 +151,10 @@ input[type="checkbox"].round-checkbox:checked + label:hover span:before {
   font-size: 36px;
 }
 
+#moveList {
+  height: 600px;
+}
+
 .current {
   font-weight: bold;
   font-size: 24px;

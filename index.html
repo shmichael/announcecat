@@ -28,10 +28,14 @@
         <label for="seconds">Seconds</label>
         <input class="text" type="number" id="seconds" value="0" style="width: 50px;">
       </div>
-      <div id="moveList" class="checkbox">
+      <div>
+        <button type="button" id="randomize">Random sequence</button>
+        <button type="button" id="aaab">AAAB sequence</button>
+        <button type="button" id="abab">ABAB sequence</button>
+        <button type="button" id="asis">Use as-is</button>
       </div>
-      <button type="button" id="clear">Clear all moves</button>
-		  <button type="button" id="prime">Generate sequence</button>
+      <textarea id="moveList"></textarea>
+      </div>
     </div>
     <div id="sequence"></div>
 		<div id="controls" style="display:none">
