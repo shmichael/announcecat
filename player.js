@@ -57,6 +57,7 @@ function switchToPlayMode(newSequence) {
 
   // Swap the controls.
   generationArea.style.display = 'none';
+  moveListTextArea.style.display = 'none';
   sequenceArea.style.display = null;
   playmodeArea.style.display = null;
 
@@ -82,6 +83,7 @@ function switchToSetupMode() {
   stop();
   // Swap the controls.
   generationArea.style.display = null;
+  moveListTextArea.style.display = null;
   sequenceArea.style.display = 'none';
   playmodeArea.style.display = 'none';
 }

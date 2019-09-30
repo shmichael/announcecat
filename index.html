@@ -19,17 +19,6 @@
 	<form>
     <div id="selection">
       <h1>Move Mixer</h1>
-      <div id="playmode" style="display:none">
-        <div class="controlrow">
-          <label for="bpm">BPM</label>
-          <input class="text" type="number" id="bpm" value="160" style="width: 50px;">
-        </div>
-        <div class="controlrow">
-          <button type="button" id="play">Play</button>
-          <button type="button" id="stop" disabled>Stop</button>
-          <button type="button" id="reset">Reset</button>
-        </div>
-      </div>
       <div id="generation">
         <div class="controlrow">
           <label for="moves">Number of moves</label>
@@ -41,10 +30,23 @@
           <button type="button" id="abab">ABAB sequence</button>
           <button type="button" id="asis">Use as-is</button>
         </div>
-        <textarea id="moveList"></textarea>
+      </div>
+      <div id="playmode" style="display:none">
+        <div class="controlrow">
+          <label for="bpm">BPM</label>
+          <input class="text" type="number" id="bpm" value="160" style="width: 50px;">
+        </div>
+        <div class="controlrow">
+          <button type="button" id="play">Play</button>
+          <button type="button" id="stop" disabled>Stop</button>
+          <button type="button" id="reset">Reset</button>
+        </div>
       </div>
     </div>
-    <div id="sequence"></div>
+    <div class="scrollable">
+      <textarea id="moveList"></textarea>
+      <div id="sequence"></div>
+    </div>
 		</div>
 	</form>
   <script src="nosleep.js"></script>
