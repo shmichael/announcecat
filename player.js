@@ -42,6 +42,7 @@ let timer;
 // Sequence of moves. Generated when button clicked.
 let sequence;
 let terms;
+let sequenceInitialHeight;
 let noSleep = new NoSleep();
 
 let player = new TermPlayer();
@@ -71,6 +72,8 @@ function switchToPlayMode(newSequence) {
   for (termIndex in newSequence) {
     addTerm(newSequence[termIndex], termIndex);
   }
+
+  sequenceInitialHeight = document.getElementById('term_2').offsetTop;
 
   saveState(true);
 }
@@ -193,10 +196,11 @@ playButton.addEventListener('click', () => {
         if (currentTerm > 0) {
           document.getElementById('term_' + (currentTerm - 1)).classList.remove('current');
         }
-        document.getElementById('term_' + currentTerm).classList.add('current');
+        let termElement = document.getElementById('term_' + currentTerm);
+        termElement.classList.add('current');
         // Scroll down, but keep at least 2 terms above.
-        if (currentTerm > 1) {
-          location.href='#term_' + (currentTerm - 2);
+        if (currentTerm > 2) {
+          window.scrollTo(0, termElement.offsetTop - sequenceInitialHeight);
         }
         player.play(sequence[currentTerm]);
         currentTerm++;
