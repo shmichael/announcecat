@@ -23,14 +23,6 @@ class TermPlayer {
   }
 }
 
-// Display checkboxes for moves.
-let moveListTextArea = document.getElementById('moveList');
-let initialText = '';
-for (let term in defaultTerms) {
-  initialText += defaultTerms[term] + "\n";
-}
-moveListTextArea.value = initialText;
-
 let bpmInput = document.getElementById('bpm');
 let randomizeButton = document.getElementById('randomize');
 let aaabButton = document.getElementById('aaab');
@@ -42,6 +34,7 @@ let resetButton = document.getElementById('reset');
 let controlsArea = document.getElementById('controls');
 let selectionArea = document.getElementById('selection');
 let sequenceArea = document.getElementById('sequence');
+let moveListTextArea = document.getElementById('moveList');
 
 // Timer for the periodic speech output. Set on play.
 let timer;
@@ -53,7 +46,11 @@ let noSleep = new NoSleep();
 
 let player = new TermPlayer();
 
-function switchToPlayMode() {
+function updateTerms() {
+  terms = moveListTextArea.value.replace(/^\s*[\r\n]|\n^$/gm, "").split('\n');
+}
+
+function switchToPlayMode(newSequence) {
   // Prime the speech synthesis.
   player.play(' ');
 
@@ -70,6 +67,12 @@ function switchToPlayMode() {
   while (sequenceArea.firstChild) {
     sequenceArea.removeChild(sequenceArea.firstChild);
   }
+
+  for (termIndex in newSequence) {
+    addTerm(newSequence[termIndex], termIndex);
+  }
+
+  saveState(true);
 }
 
 function switchToSetupMode() {
@@ -98,18 +101,27 @@ function addTerm(term, index) {
   sequenceArea.append(termDiv);
 }
 
+function saveState(playMode) {
+  if (!playMode) {
+    updateUrlParameter('terms', btoa(JSON.stringify(terms)), true);
+  } else {
+    updateUrlParameter('sequence', btoa(JSON.stringify(sequence)), true);
+  }
+}
+
 randomizeButton.addEventListener('click', () => {
-  switchToPlayMode();
+  newSequence = [];
 
   for (let i = 0; i < getSequenceLength(); i++) {
     let randomIndex = Math.floor(Math.random() * terms.length);
-    addTerm(terms[randomIndex], i);
+    newSequence.push(terms[randomIndex]);
   }
+
+  switchToPlayMode(newSequence);
 });
 
 aaabButton.addEventListener('click', () => {
-  switchToPlayMode();
-  console.log(terms);
+  newSequence = [];
 
   for (let i = 0; i < getSequenceLength()/4; i++) {
     let randomIndex = Math.floor(Math.random() * terms.length);
@@ -117,16 +129,19 @@ aaabButton.addEventListener('click', () => {
     if (randomIndex == randomIndexB) {
       randomIndexB = terms.length - 1;
     }
-    console.log("adding aaab " + randomIndex + ":" + terms[randomIndex] + ", " + randomIndexB + ":" + terms[randomIndexB]);
-    addTerm(terms[randomIndex], i*4);
-    addTerm(terms[randomIndex], i*4 + 1);
-    addTerm(terms[randomIndex], i*4 + 2);
-    addTerm(terms[randomIndexB], i*4 + 3);
+    newSequence.push(
+        terms[randomIndex],
+        terms[randomIndex],
+        terms[randomIndex],
+        terms[randomIndexB],
+    );
   }
+
+  switchToPlayMode(newSequence);
 });
 
 ababButton.addEventListener('click', () => {
-  switchToPlayMode();
+  newSequence = [];
 
   for (let i = 0; i < getSequenceLength()/4; i++) {
     let randomIndex = Math.floor(Math.random() * terms.length);
@@ -134,19 +149,25 @@ ababButton.addEventListener('click', () => {
     if (randomIndex == randomIndexB) {
       randomIndexB = terms.length - 1;
     }
-    addTerm(terms[randomIndex], i*4);
-    addTerm(terms[randomIndexB], i*4 + 1);
-    addTerm(terms[randomIndex], i*4 + 2);
-    addTerm(terms[randomIndexB], i*4 + 3);
+    newSequence.push(
+        terms[randomIndex],
+        terms[randomIndexB],
+        terms[randomIndex],
+        terms[randomIndexB]
+    );
   }
+
+  switchToPlayMode(newSequence);
 });
 
 asisButton.addEventListener('click', () => {
-  switchToPlayMode();
+  newSequence = [];
 
   for (let i in terms) {
-    addTerm(terms[i], i);
+    newSequence.push(terms[i]);
   }
+
+  switchToPlayMode(newSequence);
 });
 
 function stop() {
@@ -160,6 +181,8 @@ function stop() {
     for (el in currents) {
       currents[el].classList = '';
     }
+    
+    saveState(false);
 }
 
 stopButton.addEventListener('click', () => {
@@ -194,6 +217,33 @@ playButton.addEventListener('click', () => {
     playNext();
 });
 
+moveListTextArea.addEventListener('keyup', () => {
+    updateTerms();
+    saveState(false);
+});
+
 resetButton.addEventListener('click', () => {
   switchToSetupMode();
 });
+
+try {
+  terms = JSON.parse(atob(getUrlParameter('terms')));
+} catch {}
+
+if (!terms) {
+  try {
+    sequence = JSON.parse(atob(getUrlParameter('sequence')));
+  } catch {}
+}
+// Display checkboxes for moves.
+let initialText = '';
+
+terms = terms || defaultTerms;
+for (let term in terms) {
+  initialText += terms[term] + "\n";
+}
+moveListTextArea.value = initialText;
+
+if (sequence) {
+  switchToPlayMode(sequence);
+}
