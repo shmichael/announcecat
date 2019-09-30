@@ -31,8 +31,8 @@ let asisButton = document.getElementById('asis');
 let playButton = document.getElementById('play');
 let stopButton = document.getElementById('stop');
 let resetButton = document.getElementById('reset');
-let controlsArea = document.getElementById('controls');
-let selectionArea = document.getElementById('selection');
+let playmodeArea = document.getElementById('playmode');
+let generationArea = document.getElementById('generation');
 let sequenceArea = document.getElementById('sequence');
 let moveListTextArea = document.getElementById('moveList');
 
@@ -55,9 +55,9 @@ function switchToPlayMode(newSequence) {
   player.play(' ');
 
   // Swap the controls.
-  selectionArea.style.display = 'none';
+  generationArea.style.display = 'none';
   sequenceArea.style.display = null;
-  controlsArea.style.display = null;
+  playmodeArea.style.display = null;
 
   // Collect the terms. Removes blank lines.
   terms = moveListTextArea.value.replace(/^\s*[\r\n]|\n^$/gm, "").split('\n');
@@ -78,19 +78,13 @@ function switchToPlayMode(newSequence) {
 function switchToSetupMode() {
   stop();
   // Swap the controls.
-  selectionArea.style.display = null;
+  generationArea.style.display = null;
   sequenceArea.style.display = 'none';
-  controlsArea.style.display = 'none';
+  playmodeArea.style.display = 'none';
 }
 
 function getSequenceLength() {
-  let bpm = parseInt(bpmInput.value, 10);
-  let minutes = parseInt(document.getElementById('minutes').value, 10);
-  let seconds = parseInt(document.getElementById('seconds').value, 10);
-  let totalSongMinutes = minutes + seconds/60;
-  let totalBeats = totalSongMinutes * bpm;
-  // Sequence is one move per 8 beats.
-  return(parseInt(totalBeats / 8, 10));
+  return parseInt(document.getElementById('moves').value, 10);
 }
 
 function addTerm(term, index) {

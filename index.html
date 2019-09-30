@@ -16,33 +16,35 @@
 </head>
 <body>
 <div class="app exp">
-	<h1>Move Mixer</h1>
 	<form>
     <div id="selection">
-      <div>
-        <label for="bpm">BPM</label>
-        <input class="text" type="number" id="bpm" value="160" style="width: 50px;">
+      <h1>Move Mixer</h1>
+      <div id="playmode" style="display:none">
+        <div class="controlrow">
+          <label for="bpm">BPM</label>
+          <input class="text" type="number" id="bpm" value="160" style="width: 50px;">
+        </div>
+        <div class="controlrow">
+          <button type="button" id="play">Play</button>
+          <button type="button" id="stop" disabled>Stop</button>
+          <button type="button" id="reset">Reset</button>
+        </div>
       </div>
-      <div>
-        <label for="minutes">Minutes</label>
-        <input class="text" type="number" id="minutes" value="3" style="width: 50px;">
-        <label for="seconds">Seconds</label>
-        <input class="text" type="number" id="seconds" value="0" style="width: 50px;">
-      </div>
-      <div>
-        <button type="button" id="randomize">Random sequence</button>
-        <button type="button" id="aaab">AAAB sequence</button>
-        <button type="button" id="abab">ABAB sequence</button>
-        <button type="button" id="asis">Use as-is</button>
-      </div>
-      <textarea id="moveList"></textarea>
+      <div id="generation">
+        <div class="controlrow">
+          <label for="moves">Number of moves</label>
+          <input class="text" type="number" id="moves" value="64" style="width: 50px;">
+        </div>
+        <div class="controlrow">
+          <button type="button" id="randomize">Random sequence</button>
+          <button type="button" id="aaab">AAAB sequence</button>
+          <button type="button" id="abab">ABAB sequence</button>
+          <button type="button" id="asis">Use as-is</button>
+        </div>
+        <textarea id="moveList"></textarea>
       </div>
     </div>
     <div id="sequence"></div>
-		<div id="controls" style="display:none">
-			<button type="button" id="play">Play</button>
-			<button type="button" id="stop" disabled>Stop</button>
-			<button type="button" id="reset">Reset</button>
 		</div>
 	</form>
   <script src="nosleep.js"></script>

@@ -2,17 +2,38 @@ body {
   background-color: white;
   font-family: 'Open Sans', sans-serif;
 }
+
+button {
+  color: black;
+  background-color: #FFC;
+  text-decoration: none;
+  text-transform: uppercase;
+  border-width: 1px;
+  border-color: #333;
+  border-style: solid;
+  border-width: 2px;
+  padding: 5px 8px;
+}
+
+button:disabled {
+  background-color: #EEE;
+  color: #555;
+}
+
+.controlrow {
+  margin-bottom: 8px;
+}
+
 .app {
   max-width: 600px;
-  background-color: #aaf;
-  margin: 5% auto;
-  padding: 16px;
+  padding-left: 64px;
 }
+
 h1 {
   font-family: 'Raleway', sans-serif;
   margin: 5px 0 15px;
-  text-align: center;
 }
+
 input.text {
   border: 1px solid #ccc;
   border-radius: 10px;
@@ -22,120 +43,11 @@ input.text {
   outline: 0;
   -webkit-appearance: none;
 }
+
 input.text:focus {
   border-color: #339933;
 }
 
-
-// Checkbox
-.exp {
-  display: table;
-  width: 100%;
-  height: 100%;
-}
-/*
-.checkbox {
-  display: table-cell;
-  width: 100%;
-  height: 100%;
-  vertical-align: middle;
-  text-align: center;
-}*/
-.checkbox>div {
-  height: 30px;
-}
-.checkbox label>span {
-  display: inline-block;
-  position: relative;
-  background-color: transparent;
-  box-shadow: 0px 0px 3px #666;
-  width: 16px;
-  height: 16px;
-  transform-origin: center;
-  border: 2px solid #fff;
-  border-radius: 50%;
-  vertical-align: -6px;
-  margin-right: 10px;
-  transition: background-color 150ms 200ms, transform 350ms cubic-bezier(.78,-1.22,.17,1.89);
-}
-  
-.checkbox label>span:before {
-  content: "";
-  width: 0px;
-  height: 2px;
-  border-radius: 2px;
-  background: #fff;
-  position: absolute;
-  transform: rotate(45deg);
-  top: 8px;
-  left: 3px;
-  transition: width 50ms ease 50ms;
-  transform-origin: 0% 0%;
-}
-  
-.checkbox label>span:after {
-  content: "";
-  width: 0;
-  height: 2px;
-  border-radius: 2px;
-  background: #fff;
-  position: absolute;
-  transform: rotate(305deg);
-  top: 12px;
-  left: 5px;
-  transition: width 50ms ease;
-  transform-origin: 0% 0%;
-}
-
-.checkbox label {
-  display: inline-block;
-  cursor: pointer;
-  position: relative;
-}
-  
-.checkbox label:hover>span:before {
-  width: 5px;
-  transition: width 100ms ease;
-}
-      
-.checkbox label:hover>span:after {
-  width: 10px;
-  transition: width 150ms ease 100ms;
-}
-
-input[type="checkbox"].round-checkbox {
-  display: none;
-}
-  
-input[type="checkbox"].round-checkbox:checked + label>span {
-  background-color: #fff;
-  transform: scale(1.25);
-} 
-input[type="checkbox"].round-checkbox:checked + label>span:after {
-  width: 10px;
-  background: #1790b5;
-  transition: width 150ms ease 100ms;
-}
-      
-input[type="checkbox"].round-checkbox:checked + label>span:before {
-  width: 5px;
-  background: #1790b5;
-  transition: width 150ms ease 100ms;
-}
-input[type="checkbox"].round-checkbox:checked + label:hover span {
-  background-color: #fff;
-  transform: scale(1.25);
-}
-input[type="checkbox"].round-checkbox:checked + label:hover span:after {
-  width: 10px;
-  background: #1790b5;
-  transition: width 150ms ease 100ms;
-}
-input[type="checkbox"].round-checkbox:checked + label:hover span:before {
-  width: 5px;
-  background: #1790b5;
-  transition: width 150ms ease 100ms;
-}
 
 #controls {
   position: fixed;
@@ -145,17 +57,29 @@ input[type="checkbox"].round-checkbox:checked + label:hover span:before {
   width: 300px;
 }
 
-#controls button {
-  background-color: white;
-  size: 50px;
-  font-size: 36px;
-}
-
 #moveList {
   height: 600px;
+  width: 200px;
 }
 
 .current {
   font-weight: bold;
   font-size: 24px;
+}
+
+#selection {
+  position: fixed;
+  top: 0px;
+  left: 64px;
+  right: 64px;
+  height: 132px;
+  background-color: white;
+  padding-top: 64px;
+}
+
+#sequence {
+  background-color: white;
+  line-height: 1.8;
+  padding-top: 196px;
+  width: 200px;
 }
