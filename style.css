@@ -28,7 +28,7 @@ button:disabled {
 
 .app {
   max-width: 600px;
-  padding-left: 48px;
+  padding-left: 16px;
 }
 
 h1 {
@@ -59,7 +59,7 @@ input.text:focus {
 
 #moveList {
   height: 550px;
-  width: 200px;
+  width: 300px;
 }
 
 .current {
@@ -71,8 +71,8 @@ input.text:focus {
   width: 320px;
   position: fixed;
   top: 0px;
-  left: 64px;
-  right: 64px;
+  left: 16px;
+  right: 16px;
   height: 164px;
   background-color: white;
   padding-top: 30px;
@@ -82,8 +82,6 @@ input.text:focus {
 
 .scrollable {
   padding-top: 206px;
-  padding-left: 16px;
-  padding-right: 16px;
 }
 
 #sequence {
