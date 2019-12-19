@@ -75,8 +75,9 @@ function switchToPlayMode(newSequence) {
   }
 
   sequenceInitialHeight = document.getElementById('term_2').offsetTop;
+  window.scrollTo(0, 0);
 
-  saveState(true);
+  saveState(true /* playmode */);
 }
 
 function switchToSetupMode() {
@@ -86,6 +87,9 @@ function switchToSetupMode() {
   moveListTextArea.style.display = null;
   sequenceArea.style.display = 'none';
   playmodeArea.style.display = 'none';
+  window.scrollTo(0, 0);
+
+  saveState(false /* playmode */);
 }
 
 function getSequenceLength() {
@@ -181,7 +185,7 @@ function stop() {
       currents[el].classList = '';
     }
     
-    saveState(false);
+    saveState(false /* playmode */);
 }
 
 stopButton.addEventListener('click', () => {
@@ -219,7 +223,7 @@ playButton.addEventListener('click', () => {
 
 moveListTextArea.addEventListener('keyup', () => {
     updateTerms();
-    saveState(false);
+    saveState(false /* playmode */);
 });
 
 resetButton.addEventListener('click', () => {
