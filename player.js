@@ -1,15 +1,47 @@
 const defaultTerms = [
-  'Apple Jacks',
   'Boogie Back',
   'Boogie forward',
-  'Break step',
   'Fall off the log',
-  'Fish tails',
   'Half Breaks',
-  'Hallelujah',
   'Shorty George',
   'Suzy Q',
 ]
+
+class CymbalPlayer {
+	constructor() {
+		let context = new (window.AudioContext || window.webkitAudioContext)();
+		this.request = new XMLHttpRequest();
+		this.request.open('GET','brush.wav', true);
+		this.request.responseType='arraybuffer';
+		this.request.onload = () => {
+			context.decodeAudioData(this.request.response).then((buffer) => {
+        let timing = 60000/160;
+				this.playAtRegularTiming(context, buffer, timing);
+				setTimeout(() => this.playAtRegularTiming(context, buffer, timing*2), timing * 19/24);
+			});
+		};
+    this.queuedSounds = [];
+    this.bpm = 0;
+	}
+
+	playAtRegularTiming(context, buffer, timing) {
+		this.queuedSounds.push(setInterval(() => {
+				let source = context.createBufferSource();
+				source.buffer = buffer;
+				source.connect(context.destination);
+				source.start();
+			}, timing));
+	}
+
+  start(bpm) {
+    this.bpm = bpm;
+    this.request.send();
+  }
+
+  stop() {
+    this.queuedSounds.forEach(interval => clearInterval(interval));
+  }
+}
 
 class TermPlayer {
   constructor() {
@@ -17,8 +49,9 @@ class TermPlayer {
   }
 
   play(term) {
-    var msg = new SpeechSynthesisUtterance(term);
-    msg.rate = 2;
+    let msg = new SpeechSynthesisUtterance(term);
+    msg.volume = 1.2;
+    msg.rate = 1.5;
     window.speechSynthesis.speak(msg);
   }
 }
@@ -35,6 +68,9 @@ let playmodeArea = document.getElementById('playmode');
 let generationArea = document.getElementById('generation');
 let sequenceArea = document.getElementById('sequence');
 let moveListTextArea = document.getElementById('moveList');
+let cymbalsCheckbox = document.getElementById('cymbals');
+let movedelayArea = document.getElementById('movedelay');
+let delayInput = document.getElementById('delay');
 
 // Timer for the periodic speech output. Set on play.
 let timer;
@@ -46,6 +82,7 @@ let sequenceInitialHeight;
 let noSleep = new NoSleep();
 
 let player = new TermPlayer();
+let cymbals = new CymbalPlayer();
 
 function updateTerms() {
   terms = moveListTextArea.value.replace(/^\s*[\r\n]|\n^$/gm, "").split('\n');
@@ -173,7 +210,16 @@ asisButton.addEventListener('click', () => {
   switchToPlayMode(newSequence);
 });
 
+cymbalsCheckbox.addEventListener('click', () => {
+  if (!cymbalsCheckbox.checked) {
+    movedelayArea.style.display = 'none';
+  } else {
+    movedelayArea.style.display = null;
+  }
+});
+
 function stop() {
+    cymbals.stop();
     clearInterval(timer);
     stopButton.disabled = true;
     playButton.disabled = false;
@@ -199,6 +245,7 @@ playButton.addEventListener('click', () => {
 
     let currentTerm = 0;
     let playNext = () => {
+console.log("next");
         if (currentTerm > 0) {
           document.getElementById('term_' + (currentTerm - 1)).classList.remove('current');
         }
@@ -216,9 +263,16 @@ playButton.addEventListener('click', () => {
     }
 
     let bpm = parseInt(bpmInput.value, 10);
-    let delayValue = 60*8*1000/bpm;
-    timer = setInterval(playNext, delayValue);
-    playNext();
+    let singleBeatDelay = 60000/bpm;
+    let moveDelay = 0;
+    if (cymbalsCheckbox.checked) {
+      cymbals.start(bpm);
+      moveDelay = delayInput.value;
+    }
+    setTimeout(() => {
+      timer = setInterval(playNext, singleBeatDelay*8);
+      playNext();
+    }, moveDelay * singleBeatDelay);
 });
 
 moveListTextArea.addEventListener('keyup', () => {
