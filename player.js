@@ -8,38 +8,62 @@ const defaultTerms = [
 ]
 
 class CymbalPlayer {
-	constructor() {
-		let context = new (window.AudioContext || window.webkitAudioContext)();
-		this.request = new XMLHttpRequest();
-		this.request.open('GET','brush.wav', true);
-		this.request.responseType='arraybuffer';
-		this.request.onload = () => {
-			context.decodeAudioData(this.request.response).then((buffer) => {
-        let timing = 60000/160;
-				this.playAtRegularTiming(context, buffer, timing);
-				setTimeout(() => this.playAtRegularTiming(context, buffer, timing*2), timing * 19/24);
-			});
-		};
-    this.queuedSounds = [];
-    this.bpm = 0;
-	}
+  constructor() {
+    this.context = new (window.AudioContext || window.webkitAudioContext)();
+    this.brush = null;
+    this.hihat = null;
+    this.loadFile('brush.wav', (buffer) => this.brush = buffer);
+    this.loadFile('hh.wav', (buffer) => this.hihat = buffer);
+    this.loadFile('sd2.wav', (buffer) => this.sidedrum = buffer);
+  }
 
-	playAtRegularTiming(context, buffer, timing) {
-		this.queuedSounds.push(setInterval(() => {
-				let source = context.createBufferSource();
-				source.buffer = buffer;
-				source.connect(context.destination);
-				source.start();
-			}, timing));
-	}
+  loadFile(file, callback) {
+    let request = new XMLHttpRequest();
+    request.open('GET',file, true);
+    request.responseType='arraybuffer';
+    request.onload = () => {
+      this.context.decodeAudioData(request.response).then(callback);
+    };
+    request.send();
+  }
+
+  playSound(sound, time) {
+    let source = this.context.createBufferSource();
+    source.buffer = sound;
+    source.connect(this.context.destination);
+    source.start(time);
+  }
+
+  playSwingPhrase(beatLength) {
+    setTimeout(() => {
+      if (!this.shouldPlay) {
+	return;
+      }
+      let baseTime = this.audioResumeTime + this.bar * 8 * beatLength;
+      for (let i = 0; i < 4; i++) {
+	this.playSound(this.brush, baseTime + beatLength * 2 * i);
+	this.playSound(this.brush, baseTime + beatLength * (0.66 + 2 * i));
+	this.playSound(this.brush, baseTime + beatLength * (1 + 2 * i));
+      }
+      this.playSound(this.hihat, baseTime + beatLength * 1);
+      this.playSound(this.hihat, baseTime + beatLength * 5);
+      this.playSound(this.sidedrum, baseTime + beatLength * 8);
+      this.bar++;
+      this.playSwingPhrase(beatLength);
+    }, beatLength * 8000);
+  }
+  
 
   start(bpm) {
-    this.bpm = bpm;
-    this.request.send();
+    this.audioResumeTime = this.context.currentTime;
+    let timing = 60/bpm;
+    this.shouldPlay = true;
+    this.bar = 0;
+    this.playSwingPhrase(timing);
   }
 
   stop() {
-    this.queuedSounds.forEach(interval => clearInterval(interval));
+    this.shouldPlay = false;
   }
 }
 
@@ -51,7 +75,7 @@ class TermPlayer {
   play(term) {
     let msg = new SpeechSynthesisUtterance(term);
     msg.volume = 1.2;
-    msg.rate = 1.5;
+    msg.rate = 1.2;
     window.speechSynthesis.speak(msg);
   }
 }
@@ -245,7 +269,6 @@ playButton.addEventListener('click', () => {
 
     let currentTerm = 0;
     let playNext = () => {
-console.log("next");
         if (currentTerm > 0) {
           document.getElementById('term_' + (currentTerm - 1)).classList.remove('current');
         }
